@@ -4,42 +4,33 @@ import java.util.Map;
 
 public class Student {
 
-  private Integer id;
-  private String name;
-  private Map<Integer, Integer> hoursPerCourseId;
+    private String name;
+    private Map<Course, Integer> hoursPerCourseId;
 
-  private Student() {
-  }
+    private Student() {
+    }
 
-  public static Student create(String name, Map<Integer, Integer> courses) {
-    Student student = new Student();
-    student.name = name;
-    student.hoursPerCourseId = courses;
+    public static Student create(String name, Map<Course, Integer> courses) {
+        Student student = new Student();
+        student.name = name;
+        student.hoursPerCourseId = courses;
 
-    return student;
-  }
+        return student;
+    }
 
-  public Integer getId() {
-    return id;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public Map<Course, Integer> getHoursPerCourseId() {
+        return hoursPerCourseId;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Map<Integer, Integer> getHoursPerCourseId() {
-    return hoursPerCourseId;
-  }
-
-  public void setHoursPerCourseId(Map<Integer, Integer> hoursPerCourseId) {
-    this.hoursPerCourseId = hoursPerCourseId;
-  }
+    public void setHoursPerCourseId(Map<Course, Integer> hoursPerCourseId) {
+        this.hoursPerCourseId = hoursPerCourseId;
+    }
 }

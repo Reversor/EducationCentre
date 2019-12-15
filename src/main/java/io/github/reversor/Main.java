@@ -1,36 +1,32 @@
 package io.github.reversor;
 
+import com.opencsv.CSVReader;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.CsvToBean;
 import io.github.reversor.entity.Course;
-import io.github.reversor.entity.Student;
-import java.time.Duration;
-import java.util.Map;
+import io.github.reversor.entity.StudentDto;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Set;
 
 public class Main {
 
-  private final static Map<Integer, Course> COURSES = Map.of(
-      1, Course.create("Java SE", Duration.ofHours(42)),
-      2, Course.create("Spring", Duration.ofHours(42)),
-      3, Course.create("JavaFX", Duration.ofHours(8)),
-      4, Course.create("Hibernate", Duration.ofHours(16))
-  );
+    public static final String STUDENTS_CSV = "./src/main/resources/students.csv";
 
-  private final static Map<Integer, Student> STUDENTS = Map.of(
-      1, Student.create(
-          "Ivanov Ivan",
-          Map.of(
-              1, 30,
-              2, 20
-          )),
-      2, Student.create(
-          "Petrov Petr",
-          Map.of(
-              3, 8,
-              4, 15
-          )
-      )
-  );
+    private static Set<Course> courses;
 
-  public static void main(String[] args) {
-    // write your code here
-  }
+    public static void main(String[] args) {
+        try {
+            Reader reader = Files.newBufferedReader(Paths.get(STUDENTS_CSV));
+
+            CsvToBean<StudentDto> csvToBean = new CsvToBean<>();
+            csvToBean.setMappingStrategy(new ColumnPositionMappingStrategy<>());
+            csvToBean.setCsvReader(new CSVReader(reader));
+//          TODO csvToBean.stream().collect()
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
