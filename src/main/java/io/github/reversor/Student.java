@@ -1,61 +1,57 @@
 package io.github.reversor;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import java.time.LocalDate;
 
+@JsonRootName("student")
 public class Student {
 
-    private String name;
-    private Curriculum curriculum;
-    private Map<String, Integer> remainingHoursForCourses;
+  private String name;
+  private Curriculum curriculum;
+  @JsonProperty("start_date")
+  private LocalDate startDate;
+  private int[] marks;
 
-    private Student() {
-    }
+  public Student() {
+  }
 
-    public static Student fromCurriculum(String name, Curriculum curriculum) {
-        Student student = new Student();
-        student.name = name;
-        student.curriculum = curriculum;
-        student.remainingHoursForCourses = new HashMap<>(curriculum.getCoursesWithDuration());
+  public Student(String name, Curriculum curriculum, LocalDate startDate, int[] marks) {
+    this.name = name;
+    this.curriculum = curriculum;
+    this.startDate = startDate;
+    this.marks = marks;
+  }
 
-        return student;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public static Student fromCoursesWithCurriculumName(String studentName, String curriculumName,
-            Map<String, Integer> hoursSpentForCourses) {
-        Student student = new Student();
-        student.name = studentName;
-        student.curriculum = Curriculum.forName(curriculumName);
-        student.remainingHoursForCourses = hoursSpentForCourses;
+  public void setName(String name) {
+    this.name = name;
+  }
 
-        return student;
-    }
+  public LocalDate getStartDate() {
+    return startDate;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public void setStartDate(LocalDate startDate) {
+    this.startDate = startDate;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public int[] getMarks() {
+    return marks;
+  }
 
-    public Map<String, Integer> getRemainingHoursForCourses() {
-        return remainingHoursForCourses;
-    }
+  public void setMarks(int[] marks) {
+    this.marks = marks;
+  }
 
-    public void setRemainingHoursForCourses(Map<String, Integer> remainingHoursForCourses) {
-        this.remainingHoursForCourses = remainingHoursForCourses;
-    }
+  public Curriculum getCurriculum() {
+    return curriculum;
+  }
 
-    public void setRemainingHoursForCourse(String courseName, Integer hours) {
-
-    }
-
-    public Curriculum getCurriculum() {
-        return curriculum;
-    }
-
-    public void setCurriculum(Curriculum curriculum) {
-        this.curriculum = curriculum;
-    }
+  public void setCurriculum(Curriculum curriculum) {
+    this.curriculum = curriculum;
+  }
 }
