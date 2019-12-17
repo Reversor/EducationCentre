@@ -23,6 +23,28 @@ public class Student {
     this.marks = marks;
   }
 
+  public double getGPA() {
+    int[] marks = getMarks();
+
+    int marksSum = 0;
+    for (int mark : marks) {
+      marksSum += mark;
+    }
+
+    return (double) marksSum / marks.length;
+  }
+
+  public double getRemainingDays() {
+    double maxDays = 0;
+    for (int duration : getCurriculum().getCoursesDuration().values()) {
+      maxDays += (double) duration / 8;
+    }
+
+    int spentDays = getMarks().length;
+
+    return maxDays - spentDays;
+  }
+
   public String getName() {
     return name;
   }
