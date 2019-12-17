@@ -90,7 +90,7 @@ public class Application {
     System.out.println("Remaining days for students:");
     for (Student student : students) {
       double maxDays = 0;
-      for (Integer duration : student.getCurriculum().getCoursesDuration().values()) {
+      for (int duration : student.getCurriculum().getCoursesDuration().values()) {
         maxDays += (double) duration / 8;
       }
 
@@ -109,8 +109,10 @@ public class Application {
       return objectMapper.forType(Student[].class).readValue(file);
     } catch (IOException e) {
       e.printStackTrace();
+
+      System.exit(1);
     }
 
-    return null;
+    return new Student[0];
   }
 }
