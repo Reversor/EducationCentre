@@ -57,7 +57,25 @@ public class Application {
       }
 
       if (parse.hasOption('d')) {
-        studentStream = studentStream.filter(s -> s.getGPA() >= 4.5);
+        //TODO упростить
+        studentStream = studentStream.filter(s -> {
+          if (s.getGPA() < 4.5 && s.getRemainingHours() > 0) {
+            int neededMarksCount = (int) Math.floor((double) s.getCurriculum().getDuration() / 8);
+            double minMarksSum = neededMarksCount * 4.5;
+
+            double marksSum = 0;
+            for (int mark : s.getMarks()) {
+              marksSum += mark;
+            }
+
+            double diffMarksSum = marksSum - minMarksSum;
+            double exceptedDiffMarksSum = (neededMarksCount - s.getMarks().length) * 5;
+
+            return diffMarksSum < exceptedDiffMarksSum;
+          }
+
+          return s.getGPA() >= 4.5 && s.getRemainingHours() == 0;
+        });
       }
 
       studentStream.forEach(student -> {
