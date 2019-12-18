@@ -12,8 +12,26 @@ public class Student {
   @JsonProperty("start_date")
   private LocalDate startDate;
   private int[] marks;
-  private Integer remainingDays;
+  private Integer remainingHours;
   private Double gpa;
+
+  public boolean mayNotBeExpelled() {
+    if (getGPA() < 4.5 && getRemainingHours() > 0) {
+      int neededMarksCount = (int) Math.floor((double) curriculum.getDuration() / 8);
+
+      double marksSum = 0;
+      for (int mark : marks) {
+        marksSum += mark;
+      }
+
+      double diffMarksSum = neededMarksCount * 4.5 - marksSum;
+      double exceptedMinDiffMarksSum = (neededMarksCount - marks.length) * 5;
+
+      return diffMarksSum < exceptedMinDiffMarksSum;
+    }
+
+    return getGPA() >= 4.5;
+  }
 
   public double getGPA() {
     if (gpa == null) {
@@ -29,11 +47,11 @@ public class Student {
   }
 
   public int getRemainingHours() {
-    if (remainingDays == null) {
-      remainingDays = curriculum.getDuration() - marks.length * 8;
+    if (remainingHours == null) {
+      remainingHours = curriculum.getDuration() - marks.length * 8;
     }
 
-    return remainingDays;
+    return remainingHours;
   }
 
   public String getName() {
