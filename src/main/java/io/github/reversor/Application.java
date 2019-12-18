@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.stream.Stream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
@@ -23,18 +24,6 @@ public class Application {
           .desc("Path to JSON file")
           .hasArg()
           .required().build())
-      .addOption(Option.builder("r")
-          .longOpt("remainingDays")
-          .desc("Calc remaining days for students")
-          .build())
-      .addOption(Option.builder("G")
-          .longOpt("GPA")
-          .desc("Calculate average marks")
-          .build())
-      .addOption(Option.builder("D")
-          .longOpt("deduction")
-          .desc("Shows a students on deduction")
-          .build())
       .addOption(Option.builder("s")
           .longOpt("sorted")
           .desc("Shows a students sorted by GPA or remaining days")
@@ -51,61 +40,44 @@ public class Application {
 
       Student[] students = readStudentsFromJson(Paths.get(parse.getOptionValue("S")).toFile());
 
-      if (parse.hasOption('r')) {
-        printRemainingDays(students);
-      }
-      if (parse.hasOption('G')) {
-        printStudentsGPA(students);
-      }
-      if (parse.hasOption('D')) {
-        printStudentsOnDemand(students);
-      }
       if (parse.hasOption('s')) {
+        Stream<Student> studentStream = Arrays.stream(students);
+
         switch (parse.getOptionValue('s')) {
           case "GPA":
-            Arrays.stream(students)
-                .sorted(Comparator.comparingDouble(Student::getGPA))
-                .forEach(System.out::println);
+            studentStream = studentStream
+                .sorted(Comparator.comparingDouble(Student::getGPA));
             break;
           case "remain":
-            Arrays.stream(students)
-                .sorted(Comparator.comparingDouble(Student::getRemainingDays))
-                .forEach(System.out::println);
+            studentStream = studentStream
+                .sorted(Comparator.comparingDouble(Student::getRemainingHours));
             break;
-          default:
-            System.out.println("Unknown 'sort by' parameter");
         }
 
-      }
-      if (parse.hasOption('d')) {
-        //TODO
+        if (parse.hasOption('d')) {
+          //TODO
+          // studentStream = studentStream.filter()
+        }
+
+        studentStream.forEach(student -> {
+          Curriculum curriculum = student.getCurriculum();
+
+          System.out.printf("%s - до окончания обучения по программе %s осталось %d ч. "
+                  + "Средний балл %.1f.\n",
+              student.getName(), curriculum.getName(),
+              student.getRemainingHours(), student.getGPA()
+          );
+
+          if (student.getRemainingHours() <= 0 && student.getGPA() < 4.5) {
+            System.out.println("На отчисление.");
+          } else {
+            System.out.println("Может продолжать обучение.");
+          }
+        });
       }
 
     } catch (ParseException e) {
       e.printStackTrace();
-    }
-  }
-
-  private static void printStudentsOnDemand(Student[] students) {
-    System.out.println("Students on demand:");
-    for (Student student : students) {
-      if (student.getRemainingDays() <= 0 && student.getGPA() < 4.5) {
-        System.out.println(student.getName());
-      }
-    }
-  }
-
-  private static void printStudentsGPA(Student[] students) {
-    System.out.println("Students GPA:");
-    for (Student student : students) {
-      System.out.printf("%s: %.2f\n", student.getName(), student.getGPA());
-    }
-  }
-
-  private static void printRemainingDays(Student[] students) {
-    System.out.println("Remaining days for students:");
-    for (Student student : students) {
-      System.out.printf("%s: %.2f\n", student.getName(), student.getRemainingDays());
     }
   }
 

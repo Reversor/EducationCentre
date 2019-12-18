@@ -20,10 +20,15 @@ public enum Curriculum {
 
   private String name;
   private Map<String, Integer> coursesDuration;
+  private Integer trainingDays;
 
   Curriculum(String name, Map<String, Integer> coursesDuration) {
     this.name = name;
     this.coursesDuration = coursesDuration;
+    this.trainingDays = 0;
+    for (Integer duration : coursesDuration.values()) {
+      trainingDays += duration;
+    }
   }
 
   @JsonCreator
@@ -48,5 +53,9 @@ public enum Curriculum {
 
   public Integer getCourseDuration(String courseName) {
     return coursesDuration.get(courseName);
+  }
+
+  public Integer getDuration() {
+    return trainingDays;
   }
 }

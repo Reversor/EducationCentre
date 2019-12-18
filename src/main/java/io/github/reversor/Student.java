@@ -12,6 +12,8 @@ public class Student {
   @JsonProperty("start_date")
   private LocalDate startDate;
   private int[] marks;
+  private Integer remainingDays;
+  private Double gpa;
 
   public Student() {
   }
@@ -24,25 +26,24 @@ public class Student {
   }
 
   public double getGPA() {
-    int[] marks = getMarks();
+    if (gpa == null) {
+      int marksSum = 0;
+      for (int mark : marks) {
+        marksSum += mark;
+      }
 
-    int marksSum = 0;
-    for (int mark : marks) {
-      marksSum += mark;
+      gpa = (double) marksSum / marks.length;
     }
 
-    return (double) marksSum / marks.length;
+    return gpa;
   }
 
-  public double getRemainingDays() {
-    double maxDays = 0;
-    for (int duration : getCurriculum().getCoursesDuration().values()) {
-      maxDays += (double) duration / 8;
+  public int getRemainingHours() {
+    if (remainingDays == null) {
+      remainingDays = curriculum.getDuration() - marks.length * 8;
     }
 
-    int spentDays = getMarks().length;
-
-    return maxDays - spentDays;
+    return remainingDays;
   }
 
   public String getName() {
