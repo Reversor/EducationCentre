@@ -15,8 +15,12 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Application {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
   public static final Options OPTIONS = new Options()
       .addOption(Option.builder("S")
@@ -40,44 +44,45 @@ public class Application {
 
       Student[] students = readStudentsFromJson(Paths.get(parse.getOptionValue("S")).toFile());
 
+      Stream<Student> studentStream = Arrays.stream(students);
       if (parse.hasOption('s')) {
-        Stream<Student> studentStream = Arrays.stream(students);
-
-        switch (parse.getOptionValue('s')) {
-          case "GPA":
-            studentStream = studentStream
-                .sorted(Comparator.comparingDouble(Student::getGPA));
-            break;
-          case "remain":
-            studentStream = studentStream
-                .sorted(Comparator.comparingDouble(Student::getRemainingHours));
-            break;
+        String s = parse.getOptionValue('s');
+        if (s.equals("GPA")) {
+          studentStream = studentStream
+              .sorted(Comparator.comparingDouble(Student::getGPA));
+        } else if (s.equals("remain")) {
+          studentStream = studentStream
+              .sorted(Comparator.comparingDouble(Student::getRemainingHours));
         }
-
-        if (parse.hasOption('d')) {
-          //TODO
-          // studentStream = studentStream.filter()
-        }
-
-        studentStream.forEach(student -> {
-          Curriculum curriculum = student.getCurriculum();
-
-          System.out.printf("%s - до окончания обучения по программе %s осталось %d ч. "
-                  + "Средний балл %.1f.\n",
-              student.getName(), curriculum.getName(),
-              student.getRemainingHours(), student.getGPA()
-          );
-
-          if (student.getRemainingHours() <= 0 && student.getGPA() < 4.5) {
-            System.out.println("На отчисление.");
-          } else {
-            System.out.println("Может продолжать обучение.");
-          }
-        });
       }
 
+      if (parse.hasOption('d')) {
+        studentStream = studentStream.filter(s -> s.getGPA() >= 4.5);
+      }
+
+      studentStream.forEach(student -> {
+        Curriculum curriculum = student.getCurriculum();
+
+        StringBuilder msg = new StringBuilder(student.getName())
+            .append(" - до окончания обучения по программе ")
+            .append(curriculum.getName())
+            .append(" осталось ")
+            .append(student.getRemainingHours())
+            .append(" ч. Средний балл ")
+            .append(String.format("%.2f", student.getGPA()))
+            .append("\n");
+
+        if (student.getRemainingHours() <= 0 && student.getGPA() < 4.5) {
+          msg.append("На отчисление.");
+        } else {
+          msg.append("Может продолжать обучение.");
+        }
+
+        LOGGER.info(msg.toString());
+      });
+
     } catch (ParseException e) {
-      e.printStackTrace();
+      LOGGER.error("Wrong the application arguments", e);
     }
   }
 
@@ -89,7 +94,7 @@ public class Application {
 
       return objectMapper.forType(Student[].class).readValue(file);
     } catch (IOException e) {
-      e.printStackTrace();
+      LOGGER.error("Exception for reading json file with students");
 
       System.exit(1);
     }

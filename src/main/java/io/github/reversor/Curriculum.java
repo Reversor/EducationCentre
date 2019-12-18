@@ -32,6 +32,7 @@ public enum Curriculum {
   }
 
   @JsonCreator
+  @SuppressWarnings("unused")
   public static Curriculum forName(String name) {
     for (Curriculum curriculum : values()) {
       if (curriculum.name.equals(name)) {
